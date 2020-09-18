@@ -14,8 +14,8 @@ By default, this configuration uses [Playnite](https://github.com/JosefNemec/Pla
 ## Setup
  1. Install [Playnite](https://github.com/JosefNemec/Playnite) and configure it to your liking.
  2. (Optional) Install [JoyToKey](https://joytokey.net/en/) if you want this program to launch it so that your controller can have additional button mapping/combo functions.
- 3. Download the latest release ZIP and extract the files somewhere
- 4. Open GeForce experience > Settings > SHIELD > ADD
+ 3. Download the latest [release](https://github.com/cgarst/gamestream_launchpad/releases/) and extract the files somewhere.
+ 4. Open GeForce experience and navigate to Settings > SHIELD > ADD.
  5. In the file picker, select the `.bat` script with the resolution you want your computer to have during the GameStream.
 
 ## Development
