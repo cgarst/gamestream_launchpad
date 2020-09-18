@@ -1,5 +1,7 @@
 # GameStream Launchpad 🚀
 
+![](demo.gif)
+
 GameStream Launchpad orchestrates an optimized environment for NVIDIA GameStream connections through NVIDIA Shield hardware and/or [Moonlight](https://github.com/moonlight-stream) clients. It improves the GameStream experience with the following ideas:
 
  1. Launch the session with a controller-optimized game launcher that automatically displays all installed games from all stores (Steam, Origin, Epic, Xbox GamePass, etc).
@@ -7,7 +9,7 @@ GameStream Launchpad orchestrates an optimized environment for NVIDIA GameStream
  3. Automatically end the GameStream session and revert the host resolution when exiting the launcher.
  4. Enable optional global controller remappings that only exist during the GameStream session.
  
-This configuration uses [Playnite](https://github.com/JosefNemec/Playnite) fullscreen mode as the launcher and [JoyToKey](https://joytokey.net/en/) as the optional controller remapper.
+By default, this configuration uses [Playnite](https://github.com/JosefNemec/Playnite) fullscreen mode as the launcher and [JoyToKey](https://joytokey.net/en/) as the optional controller remapper. However it should work with anything.
  
 ## Dependencies
  1. Install [Python 3.8](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
