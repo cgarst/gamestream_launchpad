@@ -71,10 +71,6 @@ while True:
     else:
         break
 
-# Restore original resolution
-print('Restoring original resolution.')
-win32api.ChangeDisplaySettings(None, 0)
-
 # Kill joy2key
 if j2k:
     if "JoyToKey.exe" in (p.name() for p in psutil.process_iter()):
@@ -85,3 +81,7 @@ if j2k:
 print("Terminating GameStream session.")
 if "nvstreamer.exe" in (p.name() for p in psutil.process_iter()):
     os.system('taskkill /f /im nvstreamer.exe')
+
+# Restore original resolution
+print('Restoring original resolution.')
+win32api.ChangeDisplaySettings(None, 0)
