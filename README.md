@@ -6,7 +6,6 @@ GameStream Launchpad orchestrates an optimized environment for NVIDIA GameStream
  2. Automatically set a specific resolution on the host during the session.
  3. Automatically end the GameStream session and revert the host resolution when exiting the launcher.
  4. Enable optional global controller remappings that only exist during the GameStream session.
- 5. Make the experience of getting to your games that aren't natively supported by GameStream faster and more seamless.
  
 This configuration uses [Playnite](https://github.com/JosefNemec/Playnite) fullscreen mode as the launcher and [JoyToKey](https://joytokey.net/en/) as the optional controller remapper.
  
