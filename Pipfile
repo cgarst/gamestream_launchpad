@@ -10,6 +10,7 @@ pywin32 = "*"
 pypiwin32 = "*"
 psutil = "*"
 PyAutoGUI = "*"
+nuitka = "*"
 
 [requires]
 python_version = "3.8"
