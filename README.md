@@ -11,7 +11,7 @@ This configuration uses [Playnite](https://github.com/JosefNemec/Playnite) fulls
  
 ## Dependencies
  1. Install [Python 3.8](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
- 2. Install [pipenv](https://pypi.org/project/pipenv/).
+ 2. Install [pipenv](https://pypi.org/project/pipenv/) via `pip install pipenv`.
  3. Install [Playnite](https://github.com/JosefNemec/Playnite) and configure it to your liking.
  4. Install [JoyToKey](https://joytokey.net/en/) if you want your controller to have additional button mapping/combo functions.
 
