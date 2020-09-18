@@ -10,16 +10,23 @@ GameStream Launchpad orchestrates an optimized environment for NVIDIA GameStream
  4. Enable optional global controller remappings that only exist during the GameStream session.
  
 By default, this configuration uses [Playnite](https://github.com/JosefNemec/Playnite) fullscreen mode as the launcher and [JoyToKey](https://joytokey.net/en/) as the optional controller remapper. However it should work with anything.
- 
-## Dependencies
- 1. Install [Python 3.8](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
- 2. Install [pipenv](https://pypi.org/project/pipenv/) via `pip install pipenv`.
- 3. Install [Playnite](https://github.com/JosefNemec/Playnite) and configure it to your liking.
- 4. Install [JoyToKey](https://joytokey.net/en/) if you want your controller to have additional button mapping/combo functions.
 
 ## Setup
- 1. Download this repo.
+ 1. Install [Playnite](https://github.com/JosefNemec/Playnite) and configure it to your liking.
+ 2. (Optional) Install [JoyToKey](https://joytokey.net/en/) if you want this program to launch it so that your controller can have additional button mapping/combo functions.
+ 3. Download the latest release ZIP and extract the files somewhere
+ 4. Open GeForce experience > Settings > SHIELD > ADD
+ 5. In the file picker, select the `.bat` script with the resolution you want your computer to have during the GameStream.
+
+## Development
+
+### Developer Dependencies
+ 1. Install [Python 3.8](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
+ 2. Install [pipenv](https://pypi.org/project/pipenv/) via `pip install pipenv`.
+
+### Developer Setup
+ 1. Clone this repo.
  2. In the repo directory, run `pipenv install` to setup the Python environment.
  3. Ensure that things are working by running `pipenv run gamestream_launchpad.py 1280 720` and closing Playnite.
- 4. Open GeForce experience > Settings > SHIELD > ADD
- 5. In the file picker, select the `.bat` script with the host resolution you want to stream.
+ 4. Build the exe with `build.bat`
+
