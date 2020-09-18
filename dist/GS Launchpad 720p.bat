@@ -1,2 +1,2 @@
 @ECHO OFF
-start /MIN pipenv run gamestream_launchpad.exe 1280 720
+start /MIN gamestream_launchpad.exe 1280 720
