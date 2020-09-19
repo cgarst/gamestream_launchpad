@@ -2,9 +2,9 @@
 
 ![](demo.gif)
 
-GameStream Launchpad (GSLP) orchestrates an optimized environment for NVIDIA GameStream connections through NVIDIA Shield hardware and/or [Moonlight](https://github.com/moonlight-stream) clients. It improves the GameStream experience with the following ideas:
+GameStream Launchpad (GSLP) orchestrates an optimized environment for NVIDIA GameStream connections through NVIDIA Shield hardware and/or [Moonlight](https://github.com/moonlight-stream) clients. By running GSLP as a "game" through Moonlight or SHIELD instead of selecting games directly, it improves the GameStream experience with the following ideas:
 
- 1. Launch the session with a controller-optimized game launcher that automatically displays all installed games from all stores (Steam, Origin, Epic, Xbox GamePass, etc).
+ 1. Launches a controller-optimized launcher that automatically displays all installed games from all stores (Steam, Origin, Epic, Xbox GamePass, etc).
  2. Automatically set a specific resolution on the host during the session.
  3. Automatically end the GameStream session and revert the host resolution when exiting the launcher.
  4. Specify custom background processes that only live during the GameStream session, such as a global controller remappings program.
