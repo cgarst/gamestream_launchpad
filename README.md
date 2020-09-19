@@ -35,6 +35,7 @@ background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
 [SETTINGS]
 # Set debug = 1 to leave a window running after gamestream to see error messages from GSLP
 debug = 0
+sleep_on_exit = 0
 ```
 
 ## Resolution Recommendations
