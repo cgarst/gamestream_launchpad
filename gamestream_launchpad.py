@@ -15,6 +15,16 @@ from time import sleep
 def windowEnumerationHandler(hwnd, top_windows):
     top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
 
+
+def set_resolution(gamestream_width, gamestream_height):
+    print("Switching resolution to {0}x{1}".format(gamestream_width, gamestream_height))
+    devmode = pywintypes.DEVMODEType()
+    devmode.PelsWidth = int(gamestream_width)
+    devmode.PelsHeight = int(gamestream_height)
+    devmode.Fields = win32con.DM_PELSWIDTH | win32con.DM_PELSHEIGHT
+    win32api.ChangeDisplaySettings(devmode, 0)
+
+
 # Define a default config file to write if we're missing one
 config_filename = 'gamestream_launchpad_cfg.ini'
 default_config = """[LAUNCHER]
@@ -56,12 +66,7 @@ except IndexError:
     sys.exit(1)
 
 # Set resolution to target
-print("Switching resolution to {0}x{1}".format(gamestream_width, gamestream_height))
-devmode = pywintypes.DEVMODEType()
-devmode.PelsWidth = int(gamestream_width)
-devmode.PelsHeight = int(gamestream_height)
-devmode.Fields = win32con.DM_PELSWIDTH | win32con.DM_PELSHEIGHT
-win32api.ChangeDisplaySettings(devmode, 0)
+set_resolution(gamestream_width, gamestream_height)
 
 # Minimize all windows
 print("Minimizing windows")
@@ -119,7 +124,14 @@ while not playnite_focused:
 print("Watching for Playnite to close")
 while True:
     if "Playnite.FullscreenApp.exe" in (p.name() for p in psutil.process_iter()):
-        sleep(3)
+        sleep(2)
+        # Check to ensure desired GSLP resolution is still set whenever the launcher is in focus in case it didn't reset when exiting a game
+        focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
+        if focused_window == "Playnite":
+            current_width = win32api.GetSystemMetrics(0)
+            current_height = win32api.GetSystemMetrics(1)
+            if current_width != gamestream_width and current_height != gamestream_height:
+                set_resolution(gamestream_width, gamestream_height)
     else:
         break
 
