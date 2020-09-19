@@ -29,6 +29,7 @@ background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
 [SETTINGS]
 # Set debug = 1 to leave a window running after gamestream to see error messages from GSLP
 debug = 0
+sleep_on_exit = 0
 """
 
 # Write the default config
@@ -43,6 +44,7 @@ cfg_launcher = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite
 cfg_bg_paths = config['BACKGROUND']
 cfg_settings = config['SETTINGS']
 debug = cfg_settings.get('debug', '0')
+sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
 
 # Target resolution for gamestream environment
 try:
@@ -139,5 +141,11 @@ if "nvstreamer.exe" in (p.name() for p in psutil.process_iter()):
 print('Restoring original resolution.')
 win32api.ChangeDisplaySettings(None, 0)
 
+if sleep_on_exit == '1':
+# Put computer to sleep
+    print("Going to sleep")
+    os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
 if debug == '1':
+    # Leave window open for debugging
     input("Paused for debug review. Press Enter key to close.")
