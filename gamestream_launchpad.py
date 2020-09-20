@@ -50,7 +50,7 @@ if not os.path.exists(config_filename):
 # Parse the config file
 config = configparser.ConfigParser()
 config.read(config_filename)
-cfg_launcher = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullsreenApp.exe')
+cfg_launcher = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullscreenApp.exe')
 cfg_bg_paths = config['BACKGROUND']
 cfg_settings = config['SETTINGS']
 debug = cfg_settings.get('debug', '0')
