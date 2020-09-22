@@ -70,8 +70,8 @@ sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
 try:
     gamestream_width = sys.argv[1]
     gamestream_height = sys.argv[2]
-    # Launcher path override argument
-    if sys.argv[3]:
+    # If there's a 3rd argument after the .py/.exe, use it as a custom launcher path
+    if len(sys.argv) == 4:
         cfg_launcher = sys.argv[3]
 except IndexError:
     print("Error parsing host resolution arguments. Did you mean to run one of the .bat launcher scripts?")
