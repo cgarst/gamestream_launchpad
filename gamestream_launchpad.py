@@ -105,33 +105,35 @@ subprocess.Popen(launcher_exe)
 pyautogui.FAILSAFE = False
 pyautogui.moveTo(9999, 9999, duration = 0)
 
-# Focus playnite in the foreground
-results = []
-top_windows = []
-playnite_focused = False
-while not playnite_focused:
-    win32gui.EnumWindows(windowEnumerationHandler, top_windows)
-    for i in top_windows:
-        if "playnite" in i[1].lower():
-            print("Focusing Playnite")
-            win32gui.ShowWindow(i[0],5)
-            win32gui.SetForegroundWindow(i[0])
-            playnite_focused = True
-            break
-    sleep(1)
+if "Playnite" in launcher_exec_name:
+    # Focus playnite in the foreground
+    results = []
+    top_windows = []
+    launcher_focused = False
+    while not launcher_focused:
+        win32gui.EnumWindows(windowEnumerationHandler, top_windows)
+        for i in top_windows:
+            if "playnite" in i[1].lower():
+                print("Focusing Playnite")
+                win32gui.ShowWindow(i[0],5)
+                win32gui.SetForegroundWindow(i[0])
+                launcher_focused = True
+                break
+        sleep(1)
 
-# Watch for termination of Playnite to return to the system's original configuration
-print("Watching for Playnite to close")
+# Watch for termination of launcher to return to the system's original configuration
+print("Watching for launcher to close")
 while True:
-    if "Playnite.FullscreenApp.exe" in (p.name() for p in psutil.process_iter()):
+    if launcher_exec_name in (p.name() for p in psutil.process_iter()):
         sleep(2)
-        # Check to ensure desired GSLP resolution is still set whenever the launcher is in focus in case it didn't reset when exiting a game
-        focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-        if focused_window == "Playnite":
-            current_width = win32api.GetSystemMetrics(0)
-            current_height = win32api.GetSystemMetrics(1)
-            if current_width != gamestream_width and current_height != gamestream_height:
-                set_resolution(gamestream_width, gamestream_height)
+        if "Playnite" in launcher_exec_name:
+            # Check to ensure desired GSLP resolution is still set whenever Playnite is in focus in case it didn't reset when exiting a game
+            focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
+            if focused_window.lower() == "playnite":
+                current_width = win32api.GetSystemMetrics(0)
+                current_height = win32api.GetSystemMetrics(1)
+                if current_width != gamestream_width and current_height != gamestream_height:
+                    set_resolution(gamestream_width, gamestream_height)
     else:
         break
 
