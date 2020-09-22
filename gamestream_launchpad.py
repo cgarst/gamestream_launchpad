@@ -25,6 +25,16 @@ def set_resolution(gamestream_width, gamestream_height):
     win32api.ChangeDisplaySettings(devmode, 0)
 
 
+def get_process_name(p):
+    # If there are permission errors reading a process name, it's probably not the one we want, so skip it.
+    try:
+        p_name = p.name()
+    except (PermissionError, psutil.AccessDenied):
+        p_name = ""
+        pass
+    return p_name
+
+
 # Define a default config file to write if we're missing one
 config_filename = 'gamestream_launchpad_cfg.ini'
 default_config = """[LAUNCHER]
@@ -60,6 +70,9 @@ sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
 try:
     gamestream_width = sys.argv[1]
     gamestream_height = sys.argv[2]
+    # Launcher path override argument
+    if sys.argv[3]:
+        cfg_launcher = sys.argv[3]
 except IndexError:
     print("Error parsing host resolution arguments. Did you mean to run one of the .bat launcher scripts?")
     print("Usage: gamestream_launchpad.exe 1920 1080")
@@ -79,21 +92,21 @@ for path in cfg_bg_paths:
         print("Launching", expanded_path)
         exec_name = os.path.basename(expanded_path)
         # Kill the process first if it's already running
-        if exec_name in (p.name() for p in psutil.process_iter()):
+        if exec_name in (get_process_name(p) for p in psutil.process_iter()):
             os.system('taskkill /f /im ' + exec_name)
         # Start the process
         subprocess.Popen(expanded_path)
 
 # Kill leftover game launchers
 launcher_exec_name = os.path.basename(cfg_launcher)
-if launcher_exec_name in (p.name() for p in psutil.process_iter()):
+if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
     os.system('taskkill /f /im ' + launcher_exec_name)
 
 # Specific case for alternate versions of Playnite
 if "Playnite" in launcher_exec_name:
-    if "Playnite.FullscreenApp.exe" in (p.name() for p in psutil.process_iter()):
+    if "Playnite.FullscreenApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
         os.system('taskkill /f /im ' + "Playnite.FullscreenApp.exe")
-    if "Playnite.DesktopApp.exe" in (p.name() for p in psutil.process_iter()):
+    if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
         os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
 
 # Start game launcher
@@ -124,7 +137,7 @@ if "Playnite" in launcher_exec_name:
 # Watch for termination of launcher to return to the system's original configuration
 print("Watching for launcher to close")
 while True:
-    if launcher_exec_name in (p.name() for p in psutil.process_iter()):
+    if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
         sleep(2)
         if "Playnite" in launcher_exec_name:
             # Check to ensure desired GSLP resolution is still set whenever Playnite is in focus in case it didn't reset when exiting a game
@@ -143,12 +156,12 @@ for path in cfg_bg_paths:
     if os.path.exists(expanded_path):
         exec_name = os.path.basename(expanded_path)
         print("Terminating", exec_name)
-        if exec_name in (p.name() for p in psutil.process_iter()):
+        if exec_name in (get_process_name(p) for p in psutil.process_iter()):
             os.system('taskkill /f /im ' + exec_name)
 
 # Kill gamestream
 print("Terminating GameStream session.")
-if "nvstreamer.exe" in (p.name() for p in psutil.process_iter()):
+if "nvstreamer.exe" in (get_process_name(p) for p in psutil.process_iter()):
     os.system('taskkill /f /im nvstreamer.exe')
 
 # Restore original resolution
