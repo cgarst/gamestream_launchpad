@@ -81,10 +81,6 @@ sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
 # Set resolution to target
 set_resolution(gamestream_width, gamestream_height)
 
-# Minimize all windows
-print("Minimizing windows")
-pyautogui.hotkey('winleft', 'd')
-
 # Start background programs, if they're available
 for path in cfg_bg_paths:
     expanded_path = os.path.expandvars(cfg_bg_paths[path])
@@ -97,22 +93,26 @@ for path in cfg_bg_paths:
         # Start the process
         subprocess.Popen(expanded_path)
 
-# Kill leftover game launchers
-launcher_exec_name = os.path.basename(cfg_launcher)
-if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
-    os.system('taskkill /f /im ' + launcher_exec_name)
-
-# Specific case for alternate versions of Playnite
-if "Playnite" in launcher_exec_name:
-    if "Playnite.FullscreenApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
-        os.system('taskkill /f /im ' + "Playnite.FullscreenApp.exe")
-    if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
-        os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
-
 # A launcher value of false will create a wait inside of the console instead watching a program
 if cfg_launcher.lower() == "false":
     input('Press enter to end the GameStream session.')
-else:
+else:    
+    # Minimize all windows
+    print("Minimizing windows")
+    pyautogui.hotkey('winleft', 'd')
+    
+    # Kill leftover game launchers
+    launcher_exec_name = os.path.basename(cfg_launcher)
+    if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
+        os.system('taskkill /f /im ' + launcher_exec_name)
+
+    # Specific case for alternate versions of Playnite
+    if "Playnite" in launcher_exec_name:
+        if "Playnite.FullscreenApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
+            os.system('taskkill /f /im ' + "Playnite.FullscreenApp.exe")
+        if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
+            os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
+
     # Start game launcher
     print("Starting game launcher")
     launcher_exe = os.path.expandvars(cfg_launcher)
