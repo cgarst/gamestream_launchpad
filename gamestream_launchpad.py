@@ -109,46 +109,50 @@ if "Playnite" in launcher_exec_name:
     if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
         os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
 
-# Start game launcher
-print("Starting game launcher")
-launcher_exe = os.path.expandvars(cfg_launcher)
-subprocess.Popen(launcher_exe)
+# A launcher value of false will create a wait inside of the console instead watching a program
+if cfg_launcher.lower() == "false":
+    input('Press enter to end the GameStream session.')
+else:
+    # Start game launcher
+    print("Starting game launcher")
+    launcher_exe = os.path.expandvars(cfg_launcher)
+    subprocess.Popen(launcher_exe)
 
-# Move mouse cursor into the lower-right corner to pseudo-hide it
-pyautogui.FAILSAFE = False
-pyautogui.moveTo(9999, 9999, duration = 0)
+    # Move mouse cursor into the lower-right corner to pseudo-hide it
+    pyautogui.FAILSAFE = False
+    pyautogui.moveTo(9999, 9999, duration = 0)
 
-if "Playnite" in launcher_exec_name:
-    # Focus playnite in the foreground
-    results = []
-    top_windows = []
-    launcher_focused = False
-    while not launcher_focused:
-        win32gui.EnumWindows(windowEnumerationHandler, top_windows)
-        for i in top_windows:
-            if "playnite" in i[1].lower():
-                print("Focusing Playnite")
-                win32gui.ShowWindow(i[0],5)
-                win32gui.SetForegroundWindow(i[0])
-                launcher_focused = True
-                break
-        sleep(1)
+    if "Playnite" in launcher_exec_name:
+        # Focus playnite in the foreground
+        results = []
+        top_windows = []
+        launcher_focused = False
+        while not launcher_focused:
+            win32gui.EnumWindows(windowEnumerationHandler, top_windows)
+            for i in top_windows:
+                if "playnite" in i[1].lower():
+                    print("Focusing Playnite")
+                    win32gui.ShowWindow(i[0],5)
+                    win32gui.SetForegroundWindow(i[0])
+                    launcher_focused = True
+                    break
+            sleep(1)
 
-# Watch for termination of launcher to return to the system's original configuration
-print("Watching for launcher to close")
-while True:
-    if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
-        sleep(2)
-        if "Playnite" in launcher_exec_name:
-            # Check to ensure desired GSLP resolution is still set whenever Playnite is in focus in case it didn't reset when exiting a game
-            focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-            if focused_window.lower() == "playnite":
-                current_width = win32api.GetSystemMetrics(0)
-                current_height = win32api.GetSystemMetrics(1)
-                if current_width != gamestream_width and current_height != gamestream_height:
-                    set_resolution(gamestream_width, gamestream_height)
-    else:
-        break
+    # Watch for termination of launcher to return to the system's original configuration
+    print("Watching for launcher to close")
+    while True:
+        if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
+            sleep(2)
+            if "Playnite" in launcher_exec_name:
+                # Check to ensure desired GSLP resolution is still set whenever Playnite is in focus in case it didn't reset when exiting a game
+                focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
+                if focused_window.lower() == "playnite":
+                    current_width = win32api.GetSystemMetrics(0)
+                    current_height = win32api.GetSystemMetrics(1)
+                    if current_width != gamestream_width and current_height != gamestream_height:
+                        set_resolution(gamestream_width, gamestream_height)
+        else:
+            break
 
 # Terminate background programs, if they're available
 for path in cfg_bg_paths:
