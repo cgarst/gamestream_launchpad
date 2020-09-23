@@ -57,6 +57,18 @@ if not os.path.exists(config_filename):
     with open(config_filename, 'w') as out_file:
         out_file.write(default_config)
 
+# Target resolution for gamestream environment
+try:
+    gamestream_width = sys.argv[1]
+    gamestream_height = sys.argv[2]
+    # If there's a 3rd argument after the .py/.exe, use it as a custom launcher path
+    if len(sys.argv) == 4:
+        config_filename = sys.argv[3]
+except IndexError:
+    print("Error parsing host resolution arguments. Did you mean to run one of the .bat launcher scripts?")
+    print("Usage: gamestream_launchpad.exe 1920 1080 [config.ini]")
+    sys.exit(1)
+
 # Parse the config file
 config = configparser.ConfigParser()
 config.read(config_filename)
@@ -65,18 +77,6 @@ cfg_bg_paths = config['BACKGROUND']
 cfg_settings = config['SETTINGS']
 debug = cfg_settings.get('debug', '0')
 sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
-
-# Target resolution for gamestream environment
-try:
-    gamestream_width = sys.argv[1]
-    gamestream_height = sys.argv[2]
-    # If there's a 3rd argument after the .py/.exe, use it as a custom launcher path
-    if len(sys.argv) == 4:
-        cfg_launcher = sys.argv[3]
-except IndexError:
-    print("Error parsing host resolution arguments. Did you mean to run one of the .bat launcher scripts?")
-    print("Usage: gamestream_launchpad.exe 1920 1080")
-    sys.exit(1)
 
 # Set resolution to target
 set_resolution(gamestream_width, gamestream_height)
