@@ -1,4 +1,4 @@
-# Kickstart a gamestream session with a fixed resolution and game launcher
+# Wrap a gamestream session around a launcher program with configurable background tasks and resolution switching
 import win32api
 import win32.lib.win32con as win32con
 import win32gui
@@ -35,21 +35,39 @@ def get_process_name(p):
     return p_name
 
 
+def reset_launcher_resolution(gamestream_width, gamestream_height, launcher_window_name):
+    # Check to ensure desired GSLP resolution is still set whenever the launcher is in focus in case it didn't reset when exiting a game
+    focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow()).lstrip()
+    #print("Trying to match", launcher_window_name, focused_window)
+    if focused_window.startswith(launcher_window_name):
+        #print("Matched")
+        current_width = str(win32api.GetSystemMetrics(0))
+        current_height = str(win32api.GetSystemMetrics(1))
+        if current_width != gamestream_width and current_height != gamestream_height:
+            print("Resolutions don't match, changing from", current_width, current_height, "to", gamestream_width, gamestream_height)
+            set_resolution(gamestream_width, gamestream_height)
+
+
 # Define a default config file to write if we're missing one
-config_filename = 'gamestream_launchpad_cfg.ini'
+config_filename = 'gamestream_playnite.ini'
 default_config = """[LAUNCHER]
 # The path to your Playnite.FullscreenApp.exe
 launcher_path = %%LOCALAPPDATA%%\Playnite\Playnite.FullscreenApp.exe
+# Name of the window to watch to close the session when it's gone
+launcher_window_name = Playnite
 
 [BACKGROUND]
-# List as many exe's as you want here. They will run at the start of the GameStream session and be killed at the end.
-background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
+# List as many exe's or bat's as you want here. They will run at the start of the GameStream session and be killed at the end.
+# background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
 # background_exe_2 = C:\WINDOWS\system32\mspaint.exe
 
 [SETTINGS]
 # Set debug = 1 to leave a window running after gamestream to see error messages from GSLP
 debug = 0
+# Set sleep_on_exit to 1 to put the computer to sleep after the session
 sleep_on_exit = 0
+# Set close_watch_method to "process" to wait for the launcher process to totally die to exit (can be problematic if it closes to tray), or "window" to just wait the the window to close
+close_watch_method = window
 """
 
 # Write the default config
@@ -65,18 +83,22 @@ try:
     if len(sys.argv) == 4:
         config_filename = sys.argv[3]
 except IndexError:
-    print("Error parsing host resolution arguments. Did you mean to run one of the .bat launcher scripts?")
+    print("Error parsing arguments. Did you mean to run one of the .bat launcher scripts?")
     print("Usage: gamestream_launchpad.exe 1920 1080 [config.ini]")
+    input("Press Enter to exit.")
     sys.exit(1)
 
-# Parse the config file
+# Parse the config file and assume defaults otherwise
 config = configparser.ConfigParser()
 config.read(config_filename)
-cfg_launcher = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullscreenApp.exe')
+cfg_launcher_path = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullscreenApp.exe')
+cfg_launcher_window_name = config['LAUNCHER'].get('launcher_window_name', 'Playnite')
 cfg_bg_paths = config['BACKGROUND']
-cfg_settings = config['SETTINGS']
-debug = cfg_settings.get('debug', '0')
-sleep_on_exit = cfg_settings.get('sleep_on_exit', '0')
+debug = config['SETTINGS'].get('debug', '0')
+sleep_on_exit = config['SETTINGS'].get('sleep_on_exit', '0')
+close_watch_method = config['SETTINGS'].get('close_watch_method', 'window')
+
+launcher_exec_name = os.path.basename(cfg_launcher_path)
 
 # Set resolution to target
 set_resolution(gamestream_width, gamestream_height)
@@ -94,65 +116,65 @@ for path in cfg_bg_paths:
         subprocess.Popen(expanded_path)
 
 # A launcher value of false will create a wait inside of the console instead watching a program
-if cfg_launcher.lower() == "false":
+if cfg_launcher_path.lower() == "false":
     input('Press enter to end the GameStream session.')
 else:    
     # Minimize all windows
     print("Minimizing windows")
     pyautogui.hotkey('winleft', 'd')
-    
-    # Kill leftover game launchers
-    launcher_exec_name = os.path.basename(cfg_launcher)
-    if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
-        os.system('taskkill /f /im ' + launcher_exec_name)
 
-    # Specific case for alternate versions of Playnite
+    # Playnite has to be killed before it will start in fullscreen mode
     if "Playnite" in launcher_exec_name:
         if "Playnite.FullscreenApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
             os.system('taskkill /f /im ' + "Playnite.FullscreenApp.exe")
         if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
             os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
+    
+        # Move mouse cursor into the lower-right corner to pseudo-hide it because sticks out in playnite fullscreen
+        pyautogui.FAILSAFE = False
+        pyautogui.moveTo(9999, 9999, duration = 0)
 
     # Start game launcher
     print("Starting game launcher")
-    launcher_exe = os.path.expandvars(cfg_launcher)
+    launcher_exe = os.path.expandvars(cfg_launcher_path)
     subprocess.Popen(launcher_exe)
 
-    # Move mouse cursor into the lower-right corner to pseudo-hide it
-    pyautogui.FAILSAFE = False
-    pyautogui.moveTo(9999, 9999, duration = 0)
+    # Focus launcher in the foreground and maximize
+    results = []
+    top_windows = []
+    launcher_focused = False
+    while not launcher_focused:
+        win32gui.EnumWindows(windowEnumerationHandler, top_windows)
+        for i in top_windows:
+            if cfg_launcher_window_name in i[1]:
+                print("Maximizing", cfg_launcher_window_name)
+                win32gui.ShowWindow(i[0], 3)
+                print("Focusing", cfg_launcher_window_name)
+                win32gui.SetForegroundWindow(i[0])
+                launcher_focused = True
+                launcher_window_handle = i[0]
+                break
+        sleep(1)
 
-    if "Playnite" in launcher_exec_name:
-        # Focus playnite in the foreground
-        results = []
-        top_windows = []
-        launcher_focused = False
-        while not launcher_focused:
-            win32gui.EnumWindows(windowEnumerationHandler, top_windows)
-            for i in top_windows:
-                if "playnite" in i[1].lower():
-                    print("Focusing Playnite")
-                    win32gui.ShowWindow(i[0],5)
-                    win32gui.SetForegroundWindow(i[0])
-                    launcher_focused = True
-                    break
-            sleep(1)
-
-    # Watch for termination of launcher to return to the system's original configuration
-    print("Watching for launcher to close")
-    while True:
-        if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
+    # Watch for closing the launcher window to return to the system's original configuration
+    if close_watch_method == "window":
+        print("Watching for launcher window to close")
+        while win32gui.IsWindowVisible(launcher_window_handle):
+            #print("Visible:", launcher_window_handle)
             sleep(2)
-            if "Playnite" in launcher_exec_name:
-                # Check to ensure desired GSLP resolution is still set whenever Playnite is in focus in case it didn't reset when exiting a game
-                focused_window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-                if focused_window.lower() == "playnite":
-                    current_width = win32api.GetSystemMetrics(0)
-                    current_height = win32api.GetSystemMetrics(1)
-                    if current_width != gamestream_width and current_height != gamestream_height:
-                        set_resolution(gamestream_width, gamestream_height)
-        else:
-            break
+            reset_launcher_resolution(gamestream_width, gamestream_height, cfg_launcher_window_name)
+    # Alternative method that waits for the process to die (can be problematic if it minimizes to system tray)
+    elif close_watch_method == "process":
+        print("Watching for launcher process to die")
+        while True:
+            if launcher_exec_name in (get_process_name(p) for p in psutil.process_iter()):
+                sleep(2)
+                reset_launcher_resolution(gamestream_width, gamestream_height, cfg_launcher_window_name)
+            else:
+                break
+    else:
+        print("No valid close_watch_method in the config. Press Enter when you're done.")
+        input()
 
 # Terminate background programs, if they're available
 for path in cfg_bg_paths:

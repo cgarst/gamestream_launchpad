@@ -1,3 +1,5 @@
 gamestream_launchpad.spec
 build/
 /gamestream_launchpad_cfg.ini
+..gitignore.un~
+.gitignore~

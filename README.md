@@ -28,7 +28,7 @@ The config file supports an unlimited number of background processes, paths defi
 launcher_path = %%LOCALAPPDATA%%\Playnite\Playnite.FullscreenApp.exe
 
 [BACKGROUND]
-# List as many exe's as you want here. They will run at the start of the GameStream session and be killed at the end.
+# List as many exe's or bat's as you want here. They will run at the start of the GameStream session and be killed at the end.
 background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
 # background_exe_2 = C:\WINDOWS\system32\mspaint.exe
 
