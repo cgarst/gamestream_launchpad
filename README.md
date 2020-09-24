@@ -7,7 +7,7 @@ GameStream Launchpad (GSLP) offers a configurable environment for NVIDIA GameStr
  1. Sets a **custom display resolution** on the host only while the session is open.
  2. Opens and maximizes **your favorite game launcher**, which allows you to do things such as display games from multiple stores (IE: Playnite for Steam, Origin, Epic, Xbox GamePass, etc).
  3. Launches **your background programs** which close at the end of the session (such as a controller remapping program you like to use when streaming only).
- 4. Automatically **ends the GameStream session** and reverts the host resolution when the specified launcher is closed.
+ 4. Automatically **ends the GameStream session** and reverts the host resolution when the launcher window is closed.
  
 Configurations are included for **[Playnite](https://github.com/JosefNemec/Playnite)** fullscreen mode, **[RetroArch](https://github.com/libretro/RetroArch)**, **[GOG Galaxy 2](https://www.gog.com/galaxy)**, and a general purpose remote desktop.
 
