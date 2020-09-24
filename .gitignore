@@ -1,5 +1,5 @@
 gamestream_launchpad.spec
 build/
-/gamestream_launchpad_cfg.ini
+/gamestream_playnite.ini
 ..gitignore.un~
 .gitignore~
