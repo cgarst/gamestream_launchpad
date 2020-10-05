@@ -147,8 +147,9 @@ else:
         win32gui.EnumWindows(windowEnumerationHandler, top_windows)
         for i in top_windows:
             if cfg_launcher_window_name in i[1]:
-                print("Maximizing", cfg_launcher_window_name)
-                win32gui.ShowWindow(i[0], 3)
+                if not 'Fullscreen' in cfg_launcher_path:
+                    print("Maximizing", cfg_launcher_window_name)
+                    win32gui.ShowWindow(i[0], 3)
                 print("Focusing", cfg_launcher_window_name)
                 win32gui.SetForegroundWindow(i[0])
                 launcher_focused = True
