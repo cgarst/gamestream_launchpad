@@ -50,7 +50,6 @@ def reset_launcher_resolution(gamestream_width, gamestream_height, launcher_wind
 def handle_processes(paths, terminate):
     for path in paths:
         expanded_path = os.path.expandvars(paths[path])
-        print("Path: ", expanded_path)
         if os.path.exists(expanded_path):
             exec_name = os.path.basename(expanded_path)
             print("Terminating" if terminate else "Launching", expanded_path)
@@ -123,8 +122,6 @@ cfg_launcher_window_name = config['LAUNCHER'].get('launcher_window_name', 'Playn
 cfg_bg_paths = config['BACKGROUND']
 cfg_start_paths = config['SESSION_START']
 cfg_end_paths = config['SESSION_END']
-print(dict(cfg_start_paths))
-print("Hello world")
 debug = config['SETTINGS'].get('debug', '0')
 sleep_on_exit = config['SETTINGS'].get('sleep_on_exit', '0')
 close_watch_method = config['SETTINGS'].get('close_watch_method', 'window')
