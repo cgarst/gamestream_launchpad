@@ -47,6 +47,24 @@ def reset_launcher_resolution(gamestream_width, gamestream_height, launcher_wind
             print("Resolutions don't match, changing from", current_width, current_height, "to", gamestream_width, gamestream_height)
             set_resolution(gamestream_width, gamestream_height)
 
+def handle_processes(paths, terminate):
+    for path in paths:
+        expanded_path = os.path.expandvars(paths[path])
+        if os.path.exists(expanded_path):
+            exec_name = os.path.basename(expanded_path)
+            print("Terminating" if terminate else "Launching", expanded_path)
+            # Terminate even if launching, so that we kill it if it's already running
+            if exec_name in (get_process_name(p) for p in psutil.process_iter()):
+                os.system('taskkill /f /im ' + exec_name)
+            if not terminate:
+                # Start the process
+                subprocess.Popen(expanded_path)
+
+def launch_processes(paths):
+    handle_processes(paths, False)
+
+def kill_processes(paths):
+    handle_processes(paths, True)
 
 # Define a default config file to write if we're missing one
 config_filename = 'gamestream_playnite.ini'
@@ -60,6 +78,14 @@ launcher_window_name = Playnite
 # List as many exe's or bat's as you want here. They will run at the start of the GameStream session and be killed at the end.
 # background_exe_1 = C:\Program Files (x86)\JoyToKey\JoyToKey.exe
 # background_exe_2 = C:\WINDOWS\system32\mspaint.exe
+
+[SESSION_START]
+# List as many exe's or bat's as you want here. They will run when the GameStream session begins, but won't be killed when it ends.
+# start_exe_1 = C:\Some\Path\enable_bluetooth_adapter.bat
+
+[SESSION_END]
+# List as many exe's or bat's as you want here. They will run when the GameStream session ends.
+# end_exe_1 = C:\Some\Path\disable_bluetooth_adapter.bat
 
 [SETTINGS]
 # Set debug = 1 to leave a window running after gamestream to see error messages from GSLP
@@ -94,6 +120,8 @@ config.read(config_filename)
 cfg_launcher_path = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullscreenApp.exe')
 cfg_launcher_window_name = config['LAUNCHER'].get('launcher_window_name', 'Playnite')
 cfg_bg_paths = config['BACKGROUND']
+cfg_start_paths = config['SESSION_START']
+cfg_end_paths = config['SESSION_END']
 debug = config['SETTINGS'].get('debug', '0')
 sleep_on_exit = config['SETTINGS'].get('sleep_on_exit', '0')
 close_watch_method = config['SETTINGS'].get('close_watch_method', 'window')
@@ -103,22 +131,14 @@ launcher_exec_name = os.path.basename(cfg_launcher_path)
 # Set resolution to target
 set_resolution(gamestream_width, gamestream_height)
 
-# Start background programs, if they're available
-for path in cfg_bg_paths:
-    expanded_path = os.path.expandvars(cfg_bg_paths[path])
-    if os.path.exists(expanded_path):
-        print("Launching", expanded_path)
-        exec_name = os.path.basename(expanded_path)
-        # Kill the process first if it's already running
-        if exec_name in (get_process_name(p) for p in psutil.process_iter()):
-            os.system('taskkill /f /im ' + exec_name)
-        # Start the process
-        subprocess.Popen(expanded_path)
+# Start background and session_start programs, if they're available
+launch_processes(cfg_bg_paths)
+launch_processes(cfg_start_paths)
 
 # A launcher value of false will create a wait inside of the console instead watching a program
 if cfg_launcher_path.lower() == "false":
     input('Press enter to end the GameStream session.')
-else:    
+else:
     # Minimize all windows
     print("Minimizing windows")
     pyautogui.hotkey('winleft', 'd')
@@ -129,7 +149,7 @@ else:
             os.system('taskkill /f /im ' + "Playnite.FullscreenApp.exe")
         if "Playnite.DesktopApp.exe" in (get_process_name(p) for p in psutil.process_iter()):
             os.system('taskkill /f /im ' + "Playnite.DesktopApp.exe")
-    
+
         # Move mouse cursor into the lower-right corner to pseudo-hide it because sticks out in playnite fullscreen
         pyautogui.FAILSAFE = False
         pyautogui.moveTo(9999, 9999, duration = 0)
@@ -177,14 +197,9 @@ else:
         print("No valid close_watch_method in the config. Press Enter when you're done.")
         input()
 
-# Terminate background programs, if they're available
-for path in cfg_bg_paths:
-    expanded_path = os.path.expandvars(cfg_bg_paths[path])
-    if os.path.exists(expanded_path):
-        exec_name = os.path.basename(expanded_path)
-        print("Terminating", exec_name)
-        if exec_name in (get_process_name(p) for p in psutil.process_iter()):
-            os.system('taskkill /f /im ' + exec_name)
+# Terminate background and launch session_end programs, if they're available
+kill_processes(cfg_bg_paths)
+launch_processes(cfg_end_paths)
 
 # Kill gamestream
 print("Terminating GameStream session.")
