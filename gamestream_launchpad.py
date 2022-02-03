@@ -16,12 +16,18 @@ def windowEnumerationHandler(hwnd, top_windows):
     top_windows.append((hwnd, win32gui.GetWindowText(hwnd)))
 
 
-def set_resolution(gamestream_width, gamestream_height):
-    print("Switching resolution to {0}x{1}".format(gamestream_width, gamestream_height))
+def set_resolution(gamestream_width, gamestream_height,refresh_rate=None):
+    if refresh_rate is None:
+        print("Switching resolution to {0}x{1}".format(gamestream_width, gamestream_height))
+    else:
+        print("Switching resolution to {0}x{1} at {2}Hz".format(gamestream_width, gamestream_height))
     devmode = pywintypes.DEVMODEType()
     devmode.PelsWidth = int(gamestream_width)
     devmode.PelsHeight = int(gamestream_height)
     devmode.Fields = win32con.DM_PELSWIDTH | win32con.DM_PELSHEIGHT
+    if refresh_rate is not None:
+        devmode.DisplayFrequency = refresh_rate
+        devmode.Fields |= win32con.DM_DISPLAYFREQUENCY
     win32api.ChangeDisplaySettings(devmode, 0)
 
 
@@ -103,6 +109,13 @@ if not os.path.exists(config_filename):
 
 # Target resolution for gamestream environment
 try:
+    if '-r' in sys.argv:
+        rind = sys.argv.index('-r')
+        sys.argv.pop(rind)
+        refresh_rate = int(sys.argv.pop(rind))
+    else:
+        refresh_rate = None    
+
     gamestream_width = sys.argv[1]
     gamestream_height = sys.argv[2]
     # If there's a 3rd argument after the .py/.exe, use it as a custom launcher path
@@ -110,7 +123,7 @@ try:
         config_filename = sys.argv[3]
 except IndexError:
     print("Error parsing arguments. Did you mean to run one of the .bat launcher scripts?")
-    print("Usage: gamestream_launchpad.exe 1920 1080 [config.ini]")
+    print("Usage: gamestream_launchpad.exe 1920 1080 [config.ini] [-r refresh_rate_hz]")
     input("Press Enter to exit.")
     sys.exit(1)
 
@@ -129,7 +142,7 @@ close_watch_method = config['SETTINGS'].get('close_watch_method', 'window')
 launcher_exec_name = os.path.basename(cfg_launcher_path)
 
 # Set resolution to target
-set_resolution(gamestream_width, gamestream_height)
+set_resolution(gamestream_width, gamestream_height,refresh_rate)
 
 # Start background and session_start programs, if they're available
 launch_processes(cfg_bg_paths)
