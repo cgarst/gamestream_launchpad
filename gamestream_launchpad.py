@@ -20,7 +20,7 @@ def set_resolution(gamestream_width, gamestream_height,refresh_rate=None):
     if refresh_rate is None:
         print("Switching resolution to {0}x{1}".format(gamestream_width, gamestream_height))
     else:
-        print("Switching resolution to {0}x{1} at {2}Hz".format(gamestream_width, gamestream_height))
+        print("Switching resolution to {0}x{1} at {2}Hz".format(gamestream_width, gamestream_height,refresh_rate))
     devmode = pywintypes.DEVMODEType()
     devmode.PelsWidth = int(gamestream_width)
     devmode.PelsHeight = int(gamestream_height)
