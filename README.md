@@ -56,7 +56,7 @@ If your client device's native resolution isn't 16:9 then you will likely need t
 ## Development
 
 ### Developer Dependencies
- 1. Install [Python 3.8](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
+ 1. Install [Python 3.10](https://www.python.org/) for Windows, ensuring that you select "Add Python to PATH" during installation.
  2. Install [pipenv](https://pypi.org/project/pipenv/) via `pip install pipenv`.
 
 ### Developer Setup
