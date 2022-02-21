@@ -2,6 +2,7 @@
 import win32api
 import win32.lib.win32con as win32con
 import win32gui
+import win32event
 import pywintypes
 import pyautogui
 import configparser
@@ -115,6 +116,16 @@ try:
         refresh_rate = int(sys.argv.pop(rind))
     else:
         refresh_rate = None    
+    if '--no-nv-kill' in sys.argv:
+        no_nv_kill = True
+        sys.argv.remove('--no-nv-kill')
+    else:
+        no_nv_kill = False
+    if '--skip-res-reset' in sys.argv:
+        skip_res_reset = True
+        sys.argv.remove('--skip-res-reset')
+    else:
+        skip_res_reset = False
 
     gamestream_width = sys.argv[1]
     gamestream_height = sys.argv[2]
@@ -206,6 +217,22 @@ else:
                 reset_launcher_resolution(gamestream_width, gamestream_height, cfg_launcher_window_name)
             else:
                 break
+    elif close_watch_method == "playnite_mutex":
+        while True:
+            try:
+                #Instance is spelled wrong in the Playnite source code, this may need to be fixed someday
+                #for now it must be spelled Instace
+                playnite_mutex_handle = win32event.OpenMutex(win32event.SYNCHRONIZE, False, "PlayniteInstaceMutex")
+                break
+            except Exception as e:
+                print(f"Exception attempting to open Playnite mutex:{e}")
+                sleep(0.1)
+        #Playnite creates and locks a mutex so if we can lock the mutex it means Playnite has quit
+        win32event.WaitForSingleObject(playnite_mutex_handle,0xffffffff)
+        #We need to tear down the mutex or Playnite won't start again
+        win32event.ReleaseMutex(playnite_mutex_handle)
+        win32api.CloseHandle(playnite_mutex_handle)
+        
     else:
         print("No valid close_watch_method in the config. Press Enter when you're done.")
         input()
@@ -214,14 +241,17 @@ else:
 kill_processes(cfg_bg_paths)
 launch_processes(cfg_end_paths)
 
-# Kill gamestream
-print("Terminating GameStream session.")
-if "nvstreamer.exe" in (get_process_name(p) for p in psutil.process_iter()):
-    os.system('taskkill /f /im nvstreamer.exe')
-
 # Restore original resolution
-print('Restoring original resolution.')
-win32api.ChangeDisplaySettings(None, 0)
+if skip_res_reset == False:
+    print('Restoring original resolution.')
+    win32api.ChangeDisplaySettings(None, 0)
+
+# Kill gamestream
+if no_nv_kill == False:
+    print("Terminating GameStream session.")
+    if "nvstreamer.exe" in (get_process_name(p) for p in psutil.process_iter()):
+        os.system('taskkill /f /im nvstreamer.exe')
+
 
 if sleep_on_exit == '1':
 # Put computer to sleep
