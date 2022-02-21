@@ -1,1 +1,1 @@
-pipenv run pyinstaller --onefile .\gamestream_launchpad.py 
+pipenv.exe run pyinstaller --onefile gamestream_launchpad.py 
