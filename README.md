@@ -61,7 +61,7 @@ If your client device's native resolution isn't 16:9 then you will likely need t
 
 ### Developer Setup
  1. Clone this repo.
- 2. In the repo directory, run `pipenv install` to setup the Python environment.
- 3. Ensure that things are working by running `pipenv run gamestream_launchpad.py 1280 720` and closing Playnite.
+ 2. In the repo directory, run `pipenv.exe install` to setup the Python environment.
+ 3. Ensure that things are working by running `pipenv.exe run gamestream_launchpad.py 1280 720 gamestream_playnite.ini` and closing Playnite.
  4. Build the exe with `build.bat`
 
