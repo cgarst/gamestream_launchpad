@@ -144,8 +144,14 @@ config.read(config_filename)
 cfg_launcher_path = config['LAUNCHER'].get('launcher_path', r'%LOCALAPPDATA%\Playnite\Playnite.FullscreenApp.exe')
 cfg_launcher_window_name = config['LAUNCHER'].get('launcher_window_name', 'Playnite')
 cfg_bg_paths = config['BACKGROUND']
-cfg_start_paths = config['SESSION_START']
-cfg_end_paths = config['SESSION_END']
+try:
+    cfg_start_paths = config['SESSION_START']
+except KeyError:
+    cfg_start_paths = ""
+try:
+    cfg_end_paths = config['SESSION_END']
+except KeyError:
+    cfg_end_paths = ""
 debug = config['SETTINGS'].get('debug', '0')
 sleep_on_exit = config['SETTINGS'].get('sleep_on_exit', '0')
 close_watch_method = config['SETTINGS'].get('close_watch_method', 'window')
