@@ -172,6 +172,7 @@ else:
     # Minimize all windows
     print("Minimizing windows")
     pyautogui.hotkey('winleft', 'd')
+    sleep(3)
 
     # Playnite has to be killed before it will start in fullscreen mode
     if "Playnite" in launcher_exec_name:
