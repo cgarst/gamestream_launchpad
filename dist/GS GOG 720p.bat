@@ -1,2 +1,2 @@
 @ECHO OFF
-start /MIN gamestream_launchpad.exe 2560 1440 gamestream_gog_galaxy.ini
+start /MIN gamestream_launchpad.exe 1280 720 gamestream_gog_galaxy.ini
